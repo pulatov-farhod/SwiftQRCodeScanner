@@ -24,7 +24,7 @@ public protocol QRScannerCodeDelegate: class {
  to scan QR and other codes.
  */
 
-public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegate, UIImagePickerControllerDelegate, UINavigationBarDelegate {
+public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegate, UIImagePickerControllerDelegate, UINavigationBarDelegate, UINavigationControllerDelegate {
     
     var squareView: SquareView? = nil
     public weak var delegate: QRScannerCodeDelegate?
@@ -104,6 +104,8 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
         return layer
     }()
     
+    
+    
     override init(nibName nibNameOrNil: String?, bundle nibBundleOrNil: Bundle?) {
         super.init(nibName: nil, bundle: nil)
     }
@@ -140,12 +142,15 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
      - parameter view: UIView in which you want to add scanner.
      */
     
+    
     func prepareQRScannerView(_ view: UIView) {
         setupCaptureSession(devicePosition) //Default device capture position is rear
         addViedoPreviewLayer(view)
         createCornerFrame()
         addButtons(view)
     }
+    
+    
     
     //Creates corner rectagle frame with green coloe(default color)
     func createCornerFrame() {
@@ -179,8 +184,9 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
         view.layer.insertSublayer(maskLayer, above: videoPreviewLayer)
         
         let noteText = CATextLayer()
-        noteText.fontSize = 18.0
-        noteText.string = "Align QR code within frame to scan"
+        noteText.fontSize = 15.0
+        noteText.isWrapped=true
+        noteText.string = "Совместите QR-код в рамке для сканирования"
         noteText.alignmentMode = CATextLayerAlignmentMode.center
         noteText.contentsScale = UIScreen.main.scale
         noteText.frame = CGRect(x: spaceFactor, y: rect.origin.y + rect.size.height + 30, width: view.frame.size.width - (2.0 * spaceFactor), height: 22)
@@ -193,29 +199,55 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
         
         let height: CGFloat = 44.0
         let width: CGFloat = 44.0
-        let btnWidthWhenCancelImageNil: CGFloat = 60.0
+        let btnWidthWhenCancelImageNil: CGFloat = 200.0
         
         //Cancel button
         let cancelButton = UIButton()
         if let cancelImg = cancelImage {
             cancelButton.frame = CGRect(
                 x: view.frame.width/2 - width/2,
-                y: view.frame.height - 60,
+                y: view.frame.height - 130,
                 width: width,
                 height: height)
             cancelButton.setImage(cancelImg, for: .normal)
         } else {
             cancelButton.frame = CGRect(
                 x: view.frame.width/2 - btnWidthWhenCancelImageNil/2,
-                y: view.frame.height - 60,
+                y: view.frame.height - 130,
                 width: btnWidthWhenCancelImageNil,
                 height: height)
-            cancelButton.setTitle("Cancel", for: .normal)
+            cancelButton.setTitle("Отмена", for: .normal)
         }
         cancelButton.contentMode = .scaleAspectFit
         cancelButton.addTarget(self, action: #selector(dismissVC), for:.touchUpInside)
         view.addSubview(cancelButton)
         
+        let UploadImg = UIButton()
+        
+//        UploadImg.frame = CGRect( x: view.frame.width/6,
+//                       y: view.frame.height - 80,
+//                       width: btnWidthWhenCancelImageNil,
+//                       height: height)
+        UploadImg.frame = CGRect(x: view.frame.width/2-btnWidthWhenCancelImageNil/2, y: view.frame.height - 180, width: 200, height: 40)
+        UploadImg.setTitle("Загрузить", for: .normal)
+//        UploadImg.setTitleColor(UIColor(red: 0.15, green: 0.16, blue: 0.15, alpha: 1.00), for: .normal)
+        UploadImg.contentMode = .scaleToFill
+        UploadImg.addTarget(self, action: #selector(openGallery), for:.touchUpInside)
+        UploadImg.backgroundColor=UIColor(red: 0.15, green: 0.16, blue: 0.15, alpha: 1.00)
+        view.addSubview(UploadImg)
+        
+        let LighterBtn = UIButton()
+            
+        LighterBtn.frame = CGRect(x:40, y:40,  width: 90, height: 40)
+//        LighterBtn.setTitle("light", for: .normal)
+//        UploadImg.setTitleColor(UIColor(red: 0.15, green: 0.16, blue: 0.15, alpha: 1.00), for: .normal)
+        LighterBtn.contentMode = .scaleToFill
+//        LighterBtn.titleLabel?.font = UIFont(name: "Font Awesome 6 Free", size: 20)
+        LighterBtn.setTitle("Фонарик", for: .normal)
+        LighterBtn.addTarget(self, action: #selector(lightOffOn), for:.touchUpInside)
+        LighterBtn.backgroundColor=UIColor(red: 0.15, green: 0.16, blue: 0.15, alpha: 1.00)
+        view.addSubview(LighterBtn)
+    
         //Torch button
         if let flashOffImg = flashOffImage {
             let flashButtonFrame = CGRect(x: 16, y: self.view.bounds.size.height - (bottomSpace + height + 10), width: width, height: height)
@@ -224,6 +256,7 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
             flashButton!.setImage(flashOffImg, for: .normal)
             view.addSubview(flashButton!)
         }
+        
         
         //Camera button
         if let cameraImg = cameraImage {
@@ -299,6 +332,79 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
         delegate?.qrScannerDidCancel(self)
     }
     
+    var imagePicker = UIImagePickerController()
+    
+    @objc func openGallery(){
+        
+         if UIImagePickerController.isSourceTypeAvailable(.savedPhotosAlbum){
+                    print("Button capture")
+        
+                    imagePicker.delegate = self
+                    imagePicker.sourceType = .savedPhotosAlbum
+                    imagePicker.allowsEditing = false
+        
+                    present(imagePicker, animated: true, completion: nil)
+                }
+       
+    }
+    var on:Bool = true
+    @objc func lightOffOn(){
+        guard let device = AVCaptureDevice.default(for: .video) else { return }
+
+           if device.hasTorch {
+               do {
+                   try device.lockForConfiguration()
+
+                   if on == true {
+                       on = false
+                       device.torchMode = .on
+                   } else {
+                       on = true
+                       device.torchMode = .off
+                   }
+
+                   device.unlockForConfiguration()
+               } catch {
+                   print("test text")
+               }
+           } else {
+               print("light is not available")
+           }
+    }
+    public func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        print("ccccccc")
+        self.dismiss(animated: true, completion: {
+            () -> Void in
+            print("cance")
+        })
+    }
+    
+    public func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
+        guard let image = info[.originalImage] as? UIImage else {
+                print("No image found")
+                self.dismiss(animated: true, completion: {
+                    () -> Void in
+                    print("error")
+                })
+            return
+            }
+        
+            // print out the image size as a test
+            
+        if image.parseQR().count == 0{
+            print("no qr")
+        }
+        if image.parseQR().count > 0{
+            print("qr found")
+            print(image.parseQR()[0])
+            
+        }
+            self.dismiss(animated: true, completion: {
+                () -> Void in
+                print("cancel")
+            })
+            
+    }
     //MARK: - Setup and start capturing session
     
     open func startScanningQRCode() {
@@ -372,6 +478,7 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
         }
     }
 }
+    
 
 ///Currently Scanner suppoerts only portrait mode.
 ///This makes sure orientation is portrait
@@ -391,3 +498,20 @@ extension QRCodeScannerController {
     }
 }
 
+extension UIImage {
+    func parseQR() -> [String] {
+        guard let image = CIImage(image: self) else {
+            return []
+        }
+
+        let detector = CIDetector(ofType: CIDetectorTypeQRCode,
+                                  context: nil,
+                                  options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])
+
+        let features = detector?.features(in: image) ?? []
+
+        return features.compactMap { feature in
+            return (feature as? CIQRCodeFeature)?.messageString
+        }
+    }
+}
