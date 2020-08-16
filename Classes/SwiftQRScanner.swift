@@ -186,7 +186,7 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
         let noteText = CATextLayer()
         noteText.fontSize = 15.0
         noteText.isWrapped=true
-        noteText.string = "Совместите QR-код в рамке для сканирования"
+        noteText.string = "Поместите QR-код в рамку для сканирования"
         noteText.alignmentMode = CATextLayerAlignmentMode.center
         noteText.contentsScale = UIScreen.main.scale
         noteText.frame = CGRect(x: spaceFactor, y: rect.origin.y + rect.size.height + 30, width: view.frame.size.width - (2.0 * spaceFactor), height: 22)
@@ -392,15 +392,22 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
             // print out the image size as a test
             
         if image.parseQR().count == 0{
-            print("no qr")
+            delegate?.qrScannerDidFail(self, error: "not found qr")
         }
         if image.parseQR().count > 0{
             print("qr found")
             print(image.parseQR()[0])
-            
+           
+            delegate?.qrScanner(self, scanDidComplete: image.parseQR()[0])
+            /*
+            delegate?.qrScanner(self, scanDidComplete: unwrapedStringValue)
+            } else {
+                delegate?.qrScannerDidFail(self, error: "Empty string found")
+            */
         }
             self.dismiss(animated: true, completion: {
                 () -> Void in
+                //delegate?.qrScannerDidCancel(self)
                 print("cancel")
             })
             
