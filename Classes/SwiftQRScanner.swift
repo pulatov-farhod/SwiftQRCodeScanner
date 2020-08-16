@@ -410,7 +410,10 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
                 //delegate?.qrScannerDidCancel(self)
                 print("cancel")
             })
-            
+        
+        captureSession.stopRunning()
+        self.dismiss(animated: true, completion: nil)
+        
     }
     //MARK: - Setup and start capturing session
     
