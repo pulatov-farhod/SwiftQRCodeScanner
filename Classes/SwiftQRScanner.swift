@@ -26,6 +26,7 @@ public protocol QRScannerCodeDelegate: class {
 
 public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputObjectsDelegate, UIImagePickerControllerDelegate, UINavigationBarDelegate, UINavigationControllerDelegate {
     
+    public var loc: String = "ru"
     var squareView: SquareView? = nil
     public weak var delegate: QRScannerCodeDelegate?
     private var flashButton: UIButton? = nil
@@ -186,7 +187,11 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
         let noteText = CATextLayer()
         noteText.fontSize = 15.0
         noteText.isWrapped=true
-        noteText.string = "Поместите QR-код в рамку для сканирования"
+        if loc == "tj" {
+         noteText.string = "Поместите QR-код в рамку для сканирования TJ"
+        } else { 
+         noteText.string = "Поместите QR-код в рамку для сканирования"
+        }
         noteText.alignmentMode = CATextLayerAlignmentMode.center
         noteText.contentsScale = UIScreen.main.scale
         noteText.frame = CGRect(x: spaceFactor, y: rect.origin.y + rect.size.height + 30, width: view.frame.size.width - (2.0 * spaceFactor), height: 22)
@@ -216,7 +221,11 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
                 y: view.frame.height - 130,
                 width: btnWidthWhenCancelImageNil,
                 height: height)
+         if loc == "tj" {
             cancelButton.setTitle("Отмена", for: .normal)
+         } else { 
+            cancelButton.setTitle("Бе кор кардан", for: .normal)
+         }
         }
         cancelButton.contentMode = .scaleAspectFit
         cancelButton.addTarget(self, action: #selector(dismissVC), for:.touchUpInside)
@@ -229,7 +238,11 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
 //                       width: btnWidthWhenCancelImageNil,
 //                       height: height)
         UploadImg.frame = CGRect(x: view.frame.width/2-btnWidthWhenCancelImageNil/2, y: view.frame.height - 180, width: 200, height: 40)
-        UploadImg.setTitle("Загрузить", for: .normal)
+        if loc == "tj" {
+         UploadImg.setTitle("Загрузить TJ", for: .normal)
+        } else {
+         UploadImg.setTitle("Загрузить", for: .normal)
+        }
 //        UploadImg.setTitleColor(UIColor(red: 0.15, green: 0.16, blue: 0.15, alpha: 1.00), for: .normal)
         UploadImg.contentMode = .scaleToFill
         UploadImg.addTarget(self, action: #selector(openGallery), for:.touchUpInside)
@@ -243,7 +256,11 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
 //        UploadImg.setTitleColor(UIColor(red: 0.15, green: 0.16, blue: 0.15, alpha: 1.00), for: .normal)
         LighterBtn.contentMode = .scaleToFill
 //        LighterBtn.titleLabel?.font = UIFont(name: "Font Awesome 6 Free", size: 20)
-        LighterBtn.setTitle("Фонарик", for: .normal)
+        if loc == "tj" {
+         LighterBtn.setTitle("Фонарик", for: .normal)
+        } else { 
+         LighterBtn.setTitle("Фонарик TJ", for: .normal)
+        }
         LighterBtn.addTarget(self, action: #selector(lightOffOn), for:.touchUpInside)
         LighterBtn.backgroundColor=UIColor(red: 0.15, green: 0.16, blue: 0.15, alpha: 1.00)
         view.addSubview(LighterBtn)
