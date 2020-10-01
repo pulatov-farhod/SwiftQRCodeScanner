@@ -222,9 +222,10 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
                 width: btnWidthWhenCancelImageNil,
                 height: height)
          if loc == "tj" {
-            cancelButton.setTitle("Отмена", for: .normal)
+             cancelButton.setTitle("Бе кор кардан", for: .normal)
          } else { 
-            cancelButton.setTitle("Бе кор кардан", for: .normal)
+            cancelButton.setTitle("Отмена", for: .normal)
+            
          }
         }
         cancelButton.contentMode = .scaleAspectFit
