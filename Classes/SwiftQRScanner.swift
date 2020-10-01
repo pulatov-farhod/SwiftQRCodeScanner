@@ -188,7 +188,7 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
         noteText.fontSize = 15.0
         noteText.isWrapped=true
         if loc == "tj" {
-         noteText.string = "Поместите QR-код в рамку для сканирования TJ"
+         noteText.string = "Рамзи QR-ро дар чорчӯбаи скан ҷойгир кунед"
         } else { 
          noteText.string = "Поместите QR-код в рамку для сканирования"
         }
@@ -239,7 +239,7 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
 //                       height: height)
         UploadImg.frame = CGRect(x: view.frame.width/2-btnWidthWhenCancelImageNil/2, y: view.frame.height - 180, width: 200, height: 40)
         if loc == "tj" {
-         UploadImg.setTitle("Загрузить TJ", for: .normal)
+         UploadImg.setTitle("Боргирии QR аз галерея", for: .normal)
         } else {
          UploadImg.setTitle("Загрузить", for: .normal)
         }
@@ -257,9 +257,9 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
         LighterBtn.contentMode = .scaleToFill
 //        LighterBtn.titleLabel?.font = UIFont(name: "Font Awesome 6 Free", size: 20)
         if loc == "tj" {
-         LighterBtn.setTitle("Фонарик", for: .normal)
+         LighterBtn.setTitle("Чароғак", for: .normal)
         } else { 
-         LighterBtn.setTitle("Фонарик TJ", for: .normal)
+         LighterBtn.setTitle("Фонарик", for: .normal)
         }
         LighterBtn.addTarget(self, action: #selector(lightOffOn), for:.touchUpInside)
         LighterBtn.backgroundColor=UIColor(red: 0.15, green: 0.16, blue: 0.15, alpha: 1.00)
