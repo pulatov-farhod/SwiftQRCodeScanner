@@ -58,6 +58,7 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
     lazy var frontDevice: AVCaptureDevice? = {
         if #available(iOS 10, *) {
             if let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .front) {
+                //device.focusMode
                 return device
             }
         } else {
@@ -101,6 +102,7 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
     lazy var videoPreviewLayer: AVCaptureVideoPreviewLayer = {
         let layer = AVCaptureVideoPreviewLayer(session: self.captureSession)
         layer.videoGravity = AVLayerVideoGravity.resizeAspectFill
+        //layer.videoGravity =
         layer.cornerRadius = 10.0
         return layer
     }()
@@ -149,9 +151,29 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
         addViedoPreviewLayer(view)
         createCornerFrame()
         addButtons(view)
+        
+        turnOnFocus()
     }
     
-    
+    func turnOnFocus() {
+        guard let device = AVCaptureDevice.default(for: .video) else { return }
+
+           if device.hasTorch {
+               do {
+                   try device.lockForConfiguration()
+
+                    device.focusPointOfInterest = CGPoint(x:0.5,y:0.45)
+                device.exposureMode = .continuousAutoExposure
+                device.focusMode = .continuousAutoFocus
+                    //device.focusMode  = .autoFocus
+                    device.unlockForConfiguration()
+               } catch {
+                   print("test text")
+               }
+           } else {
+               print("focus")
+           }
+    }
     
     //Creates corner rectagle frame with green coloe(default color)
     func createCornerFrame() {
@@ -163,6 +185,12 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
                 x: self.view.frame.midX - width/2,
                 y: self.view.frame.midY - (width+bottomSpace)/2),
             size: CGSize.init(width: width, height: height))
+        
+        dataOutput.rectOfInterest = CGRect.init(x:0.2, y:0.2, width: 0.6, height: 0.6)
+        //dataOutput.rectOfInterest = self.convertRectOfInterest(rect: rect)
+        print(dataOutput.rectOfInterest)
+
+        
         self.squareView = SquareView(frame: rect)
         if let squareView = squareView {
             self.view.backgroundColor = UIColor(white: 0.0, alpha: 0.5)
@@ -171,6 +199,8 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
             
             addMaskLayerToVideoPreviewLayerAndAddText(rect: rect)
         }
+        
+       
     }
     
     func addMaskLayerToVideoPreviewLayerAndAddText(rect: CGRect) {
@@ -440,6 +470,17 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
         captureSession.startRunning()
     }
     
+    func convertRectOfInterest(rect: CGRect) -> CGRect {
+        let screenRect = self.view.frame
+        let screenWidth = screenRect.width
+        let screenHeight = screenRect.height
+        let newX = 1 / (screenWidth / rect.minX)
+        let newY = 1 / (screenHeight / rect.minY)
+        let newWidth = 1 / (screenWidth / rect.width)
+        let newHeight = 1 / (screenHeight / rect.height)
+        return CGRect(x: newX, y: newY, width: newWidth, height: newHeight)
+    }
+    
     private func setupCaptureSession(_ devicePostion: AVCaptureDevice.Position) {
         if captureSession.isRunning { return }
         
@@ -462,6 +503,7 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
                     return
                 }
                 captureSession.addInput(defaultDeviceInput)
+                //captureSession
             }
             break
         default: print("Do nothing")
@@ -472,16 +514,50 @@ public class QRCodeScannerController: UIViewController, AVCaptureMetadataOutputO
             self.dismiss(animated: true, completion: nil)
             return
         }
+  
         
         captureSession.addOutput(dataOutput)
-        dataOutput.metadataObjectTypes = dataOutput.availableMetadataObjectTypes
+        
+        dataOutput.metadataObjectTypes = [.qr] //dataOutput.availableMetadataObjectTypes
         dataOutput.setMetadataObjectsDelegate(self, queue: DispatchQueue.main)
+    }
+    
+    fileprivate func getRectOfInterest() -> CGRect {
+                
+        let width: CGFloat = 200
+        let height: CGFloat = 200
+        
+        let x1 = view.frame.maxX - width/2
+        let y1 = view.frame.maxY - height/2
+        
+        //let x2 = (x1/view.frame.size.width)
+        //let y2 = (y1/(view.frame.size.height - bottomSpace))
+        
+        //let currentInput = getCurrentInput()
+        
+        //let w1 = view.frame.maxY //(width/videoPreviewLayer.frame.maxX)+x2
+        //let h1 = height/view.frame.maxY
+        
+        
+        let re = CGRect(x: x1, y: y1, width: width, height: height)
+        
+        print(re)
+          
+        return re
     }
     
     //Inserts layer to view
     private func addViedoPreviewLayer(_ view: UIView) {
         videoPreviewLayer.frame = CGRect(x:view.bounds.origin.x, y: view.bounds.origin.y, width: view.bounds.size.width, height: view.bounds.size.height - bottomSpace)
+        
+       
+        //dataOutput.rectOfInterest = self.getRectOfInterest()
         view.layer.insertSublayer(videoPreviewLayer, at: 0)
+        
+        
+        //captureSession.stopRunning()
+        //dataOutput.rectOfInterest = self.getRectOfInterest()
+        //captureSession.startRunning()
     }
     
     // This method get called when Scanning gets complete
