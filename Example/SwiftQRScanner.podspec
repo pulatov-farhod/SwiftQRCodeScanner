@@ -7,9 +7,9 @@
 #
 
 Pod::Spec.new do |s|
-  s.name             = 'SwiftQRScanner'
-  s.version          = '0.1.4'
-  s.summary          = 'Read QR Codes using SwiftQRScanner'
+  s.name             = 'SwiftQRCodeScanner'
+  s.version          = '0.1.5'
+  s.summary          = 'Read QR Codes using SwiftQRCodeScanner'
 
 # This description is used to generate tags and improve search results.
 #   * Think: What does it do? Why did you write it? What is the focus?
@@ -21,11 +21,11 @@ Pod::Spec.new do |s|
 Read QR codes using SwiftQRScanner with easy steps.
                        DESC
 
-  s.homepage         = 'https://github.com/vinodiOS/SwiftQRScanner'
+  s.homepage         = 'https://github.com/pulatov-farhod/SwiftQRCodeScanner'
   # s.screenshots     = 'www.example.com/screenshots_1', 'www.example.com/screenshots_2'
   s.license          = { :type => 'MIT', :file => 'LICENSE' }
   s.author           = { 'vinodiOS' => 'vinod.jagtap@hotmail.com' }
-  s.source           = { :git => 'https://github.com/vinodiOS/SwiftQRScanner.git', :tag => s.version.to_s }
+  s.source           = { :git => 'https://github.com/pulatov-farhod/SwiftQRCodeScanner.git', :tag => s.version.to_s }
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '11.0'
